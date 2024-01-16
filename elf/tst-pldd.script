@@ -1,0 +1,2 @@
+# We need to run this as root on Ubuntu to get ptrace permissions:
+su
