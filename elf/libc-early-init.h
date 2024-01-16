@@ -23,6 +23,8 @@ struct link_map;
 
 /* If LIBC_MAP is not NULL, look up the __libc_early_init symbol in it
    and call this function, with INITIAL as the argument.  */
+/* 如果 LIBC_MAP 不为 NULL，则在其中查找 __libc_early_init 符号并调用此函数，
+   参数为 INITIAL。 */
 void _dl_call_libc_early_init (struct link_map *libc_map, _Bool initial)
   attribute_hidden;
 

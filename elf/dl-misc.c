@@ -37,10 +37,10 @@ _dl_sysdep_read_whole_file (const char *file, size_t *sizep, int prot)
 {
   void *result = MAP_FAILED;
   struct __stat64_t64 st;
-  int fd = __open64_nocancel (file, O_RDONLY | O_CLOEXEC);    // 打开ld.so.cache
+  int fd = __open64_nocancel (file, O_RDONLY | O_CLOEXEC);    // 打开文件（ld.so.cache or ld.so.preload）
   if (fd >= 0)
     {
-      if (__fstat64_time64 (fd, &st) >= 0)
+      if (__fstat64_time64 (fd, &st) >= 0)  // 获取文件的状态信息
 	{
 	  *sizep = st.st_size;
 
@@ -49,7 +49,7 @@ _dl_sysdep_read_whole_file (const char *file, size_t *sizep, int prot)
 	  if (*sizep != 0)
 	    /* Map a copy of the file contents.  */
       /* 映射文件的副本。 */
-	    result = __mmap (NULL, *sizep, prot,
+	    result = __mmap (NULL, *sizep, prot,  // NULL：让内核自动选择映射的起始地址，*sizep：映射的长度，prot：映射区域的保护方式
 #ifdef MAP_COPY
 			     MAP_COPY
 #else
@@ -58,7 +58,7 @@ _dl_sysdep_read_whole_file (const char *file, size_t *sizep, int prot)
 #ifdef MAP_FILE
 			     | MAP_FILE
 #endif
-			     , fd, 0);
+			     , fd, 0);  // 映射目标文件的文件描述符，映射目标文件的偏移量
 	}
       __close_nocancel (fd);
     }

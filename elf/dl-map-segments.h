@@ -106,9 +106,9 @@ _dl_map_segments(struct link_map *l, int fd,
        作为一个细节，有时我们有一个地址，我们希望在这个地址上映射这样的对象；但是这只是
        一个偏好，操作系统可以做任何它想做的事情。 */
     ElfW(Addr) mappref                                // 计算出的映射的首选地址（绝对地址）
-        = (ELF_PREFERRED_ADDRESS(loader, maplength,   // mappref = ELF_PREFERRED_ADDRESS - MAP_BASE_ADDR，得到相对于基地址的偏移量
+        = (ELF_PREFERRED_ADDRESS(loader, maplength,   // 除非在powerPC平台，ELF_PREFERRED_ADDRESS都返回第三个参数，一般情况下计算结果是NULL，到mmap时还是让内核决定加载地址
                                  c->mapstart & GLRO(dl_use_load_bias)) - // 是否使用加载偏移
-           MAP_BASE_ADDR(l));                                             // 加载器的基地址，似乎是历史包袱，但对于大多数平台而言实际宏定义为0，所以实际mappref计算出的就是绝对地址
+           MAP_BASE_ADDR(l));
 
     /* Remember which part of the address space this object uses.  */
     /* 记录该对象使用的地址空间的哪一部分。 */
@@ -162,12 +162,12 @@ _dl_map_segments(struct link_map *l, int fd,
   postmap:
     _dl_postprocess_loadcmd(l, header, c); // 调用_dl_postprocess_loadcmd处理加载命令
 
-    if (c->allocend > c->dataend) // 如果段的分配结束地址大于数据结束地址，如果是表示中间存在空洞
+    if (c->allocend > c->dataend) // 如果段的分配结束地址大于数据结束地址，表示这里是 bss 段
     {
       /* Extra zero pages should appear at the end of this segment,
          after the data mapped from the file.   */
       /* 零页应该出现在该段的末尾，在从文件映射的数据之后。 */
-      ElfW(Addr) zero, zeroend, zeropage;
+      ElfW(Addr) zero, zeroend, zeropage;   // 设置zero为 bss 段的起始地址，zeroend 为 bss 段的结束地址，zeropage 为 zero 的值向上取整
 
       zero = l->l_addr + c->dataend;
       zeroend = l->l_addr + c->allocend;

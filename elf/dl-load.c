@@ -1264,7 +1264,10 @@ static
 	/* Make sure we are not dlopen'ing an object that has the
 	   DF_1_NOOPEN flag set, or a PIE object.  */
 	/* 确保我们不会dlopen具有设置DF_1_NOOPEN标志或PIE对象的对象。 */
-	if ((__glibc_unlikely(l->l_flags_1 & DF_1_NOOPEN) && (mode & __RTLD_DLOPEN)) || (__glibc_unlikely(l->l_flags_1 & DF_1_PIE) && __glibc_unlikely((mode & __RTLD_OPENEXEC) == 0)))
+	if ((__glibc_unlikely(l->l_flags_1 & DF_1_NOOPEN) && 
+		(mode & __RTLD_DLOPEN)) || 
+		(__glibc_unlikely(l->l_flags_1 & DF_1_PIE) && 
+		__glibc_unlikely((mode & __RTLD_OPENEXEC) == 0)))
 	{
 		if (l->l_flags_1 & DF_1_PIE)
 			errstring = N_("cannot dynamically load position-independent executable");

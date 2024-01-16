@@ -91,7 +91,7 @@ static __always_inline void
 _dl_postprocess_loadcmd (struct link_map *l, const ElfW(Ehdr) *header,
                          const struct loadcmd *c)
 {
-  if (c->prot & PROT_EXEC)
+  if (c->prot & PROT_EXEC)          /* 这是一个可执行段 */
     l->l_text_end = l->l_addr + c->mapend;
 
   if (l->l_phdr == 0
@@ -99,6 +99,7 @@ _dl_postprocess_loadcmd (struct link_map *l, const ElfW(Ehdr) *header,
       && ((size_t) (c->mapend - c->mapstart + c->mapoff)
           >= header->e_phoff + header->e_phnum * sizeof (ElfW(Phdr))))
     /* Found the program header in this segment.  */
+    /* 在这个段中找到了程序头。 */
     l->l_phdr = (void *) (uintptr_t) (c->mapstart + header->e_phoff
                                       - c->mapoff);
 }

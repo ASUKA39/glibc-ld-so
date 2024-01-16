@@ -486,7 +486,7 @@ _dl_start_final(void *arg, struct dl_start_final_info *info)
   GL(dl_rtld_map).l_relocated = 1;
 #endif
   _dl_setup_hash(&GL(dl_rtld_map));
-  // _dl_rtld_map 就是动态链接器自身的 link_map 结构，它是一个全局变量
+  // _dl_rtld_map 就是动态链接器自身的 link_map 结构
   GL(dl_rtld_map).l_real = &GL(dl_rtld_map);
   GL(dl_rtld_map).l_map_start = (ElfW(Addr))_begin;
   GL(dl_rtld_map).l_map_end = (ElfW(Addr))_end;
@@ -871,20 +871,23 @@ do_preload(const char *fname, struct link_map *main_map, const char *where)
 
   unsigned int old_nloaded = GL(dl_ns)[LM_ID_BASE]._ns_nloaded;
 
-  (void)_dl_catch_error(&objname, &err_str, &malloced, map_doit, &args);
+  (void)_dl_catch_error(&objname, &err_str, &malloced, map_doit, &args);  // _dl_catch_error 负责调用 map_doit 函数并捕获异常
   if (__glibc_unlikely(err_str != NULL))
   {
     _dl_error_printf("\
 ERROR: ld.so: object '%s' from %s cannot be preloaded (%s): ignored.\n",
                      fname, where, err_str);
     /* No need to call free, this is still before
- the libc's malloc is used.  */
+      the libc's malloc is used.  */
+    // 不需要调用 free，这仍然是在 libc 的 malloc 使用之前。
   }
   else if (GL(dl_ns)[LM_ID_BASE]._ns_nloaded != old_nloaded)
     /* It is no duplicate.  */
+    /* 不是重复的。 */
     return 1;
 
   /* Nothing loaded.  */
+  /* 没有加载。 */
   return 0;
 }
 
@@ -920,6 +923,10 @@ security_init(void)
    (If the binary is running setuid all elements containing a '/' are
    ignored since it is insecure.)  Return the number of preloads
    performed.   Ditto for --preload command argument.  */
+/* LD_PRELOAD 环境变量给出了由空格或冒号分隔的库列表，这些库在可执行文件的依赖项之前加载，
+   并且被预先添加到全局范围列表中。
+   (如果二进制文件正在运行 setuid，则忽略所有包含“/”的元素，因为它是不安全的。)
+   返回执行的预加载数量。同样适用于 --preload 命令参数。*/
 unsigned int
 handle_preload_list(const char *preloadlist, struct link_map *main_map,
                     const char *where)
@@ -931,7 +938,8 @@ handle_preload_list(const char *preloadlist, struct link_map *main_map,
   while (*p != '\0')
   {
     /* Split preload list at space/colon.  */
-    size_t len = strcspn(p, " :");
+    // 在空格或冒号处分割预加载列表。
+    size_t len = strcspn(p, " :");  // strcspn 返回 p 中第一个不在 " :" 中的字符的位置
     if (len > 0 && len < sizeof(fname))
     {
       memcpy(fname, p, len);
@@ -941,6 +949,7 @@ handle_preload_list(const char *preloadlist, struct link_map *main_map,
       fname[0] = '\0';
 
     /* Skip over the substring and the following delimiter.  */
+    // 跳过子字符串和后面的分隔符。
     p += len;
     if (*p != '\0')
       ++p;
@@ -1555,16 +1564,16 @@ dl_main(const ElfW(Phdr) * phdr,
     ++_dl_argv;
 
     /* The initialization of _dl_stack_flags done below assumes the
- executable's PT_GNU_STACK may have been honored by the kernel, and
- so a PT_GNU_STACK with PF_X set means the stack started out with
- execute permission.  However, this is not really true if the
- dynamic linker is the executable the kernel loaded.  For this
- case, we must reinitialize _dl_stack_flags to match the dynamic
- linker itself.  If the dynamic linker was built with a
- PT_GNU_STACK, then the kernel may have loaded us with a
- nonexecutable stack that we will have to make executable when we
- load the program below unless it has a PT_GNU_STACK indicating
- nonexecutable stack is ok.  */
+        executable's PT_GNU_STACK may have been honored by the kernel, and
+        so a PT_GNU_STACK with PF_X set means the stack started out with
+        execute permission.  However, this is not really true if the
+        dynamic linker is the executable the kernel loaded.  For this
+        case, we must reinitialize _dl_stack_flags to match the dynamic
+        linker itself.  If the dynamic linker was built with a
+        PT_GNU_STACK, then the kernel may have loaded us with a
+        nonexecutable stack that we will have to make executable when we
+        load the program below unless it has a PT_GNU_STACK indicating
+        nonexecutable stack is ok.  */
     /* 下面对 _dl_stack_flags 的初始化假设可执行文件的 PT_GNU_STACK 可能已经被内核采用，
        因此设置了 PF_X 的 PT_GNU_STACK 意味着堆栈最初具有执行权限。但是，如果动态链接器是内核加载的可执行文件，
        那么这并不是真的。对于这种情况，我们必须重新初始化 _dl_stack_flags 以匹配动态链接器本身。
@@ -1809,15 +1818,16 @@ dl_main(const ElfW(Phdr) * phdr,
     /* 如果没有直接调用，则动态链接器共享对象文件是通过 PT_INTERP 名称找到的。 */
     GL(dl_rtld_map).l_name = (char *)GL(dl_rtld_map).l_libname->name;
   GL(dl_rtld_map).l_type = lt_library;
-  main_map->l_next = &GL(dl_rtld_map);
-  GL(dl_rtld_map).l_prev = main_map;
-  ++GL(dl_ns)[LM_ID_BASE]._ns_nloaded;
+  main_map->l_next = &GL(dl_rtld_map);  // 将 ld.so 的 map 放到可执行文件的 map 的后面
+  GL(dl_rtld_map).l_prev = main_map;    // 设置 ld.so 的 map 的前驱为可执行文件的 map
+  ++GL(dl_ns)[LM_ID_BASE]._ns_nloaded;  // 增加全局命名空间的加载的共享对象的数量
   ++GL(dl_load_adds);
 
   /* If LD_USE_LOAD_BIAS env variable has not been seen, default
      to not using bias for non-prelinked PIEs and libraries
      and using it for executables or prelinked PIEs or libraries.  */
-  /* 如果没有看到 LD_USE_LOAD_BIAS 环境变量，则默认不使用偏差来加载非预链接的 PIE 和库，并使用它来加载可执行文件或预链接的 PIE 或库。 */
+  /* 如果没有看到 LD_USE_LOAD_BIAS 环境变量，则默认不使用偏差来加载非预链接的 PIE 和库，
+      并使用它来加载可执行文件或预链接的 PIE 或库。 */
   if (GLRO(dl_use_load_bias) == (ElfW(Addr)) - 2)
     GLRO(dl_use_load_bias) = main_map->l_addr == 0 ? -1 : 0;
 
@@ -2014,9 +2024,9 @@ dl_main(const ElfW(Phdr) * phdr,
       {
         char *p;
         runp = file;
-        while ((p = strsep(&runp, ": \t\n")) != NULL)
+        while ((p = strsep(&runp, ": \t\n")) != NULL)   // 以空格、制表符、换行符或冒号为分隔符，分割字符串，解析出预加载的库的路径
           if (p[0] != '\0')
-            npreloads += do_preload(p, main_map, preload_file);
+            npreloads += do_preload(p, main_map, preload_file);   // 加载预加载的库
       }
 
       if (problem != NULL)
@@ -2030,7 +2040,7 @@ dl_main(const ElfW(Phdr) * phdr,
 
       /* We don't need the file anymore.  */
       /* 我们不再需要该文件。 */
-      __munmap(file, file_size);
+      __munmap(file, file_size);    // 释放文件的内存
     }
   }
 
@@ -2064,7 +2074,7 @@ dl_main(const ElfW(Phdr) * phdr,
   {
     RTLD_TIMING_VAR(start);
     rtld_timer_start(&start);
-    _dl_map_object_deps(main_map, preloads, npreloads,
+    _dl_map_object_deps(main_map, preloads, npreloads,    // 分析可执行文件的依赖项
                         state.mode == rtld_mode_trace, 0);
     rtld_timer_accum(&load_time, start);
   }
@@ -2159,9 +2169,9 @@ dl_main(const ElfW(Phdr) * phdr,
   if (__glibc_unlikely(state.mode != rtld_mode_normal))
   {
     /* We were run just to list the shared libraries.  It is
- important that we do this before real relocation, because the
- functions we call below for output may no longer work properly
- after relocation.  */
+      important that we do this before real relocation, because the
+      functions we call below for output may no longer work properly
+      after relocation.  */
     /* 我们只是为了列出共享库而运行。重要的是，我们在真正的重定位之前就这样做，
        因为我们在重定位后调用的函数可能不再正常工作。 */
     struct link_map *l;
@@ -2399,14 +2409,16 @@ dl_main(const ElfW(Phdr) * phdr,
     _exit(0);
   }
 
-  if (main_map->l_info[ADDRIDX(DT_GNU_LIBLIST)] && !__builtin_expect(GLRO(dl_profile) != NULL, 0) && !__builtin_expect(GLRO(dl_dynamic_weak), 0))
+  if (main_map->l_info[ADDRIDX(DT_GNU_LIBLIST)] &&        // 如果有预链接的库
+      !__builtin_expect(GLRO(dl_profile) != NULL, 0) &&   // 如果没有启用性能分析
+      !__builtin_expect(GLRO(dl_dynamic_weak), 0))        // 如果没有启用动态弱符号
   {
     ElfW(Lib) * liblist, *liblistend;
     struct link_map **r_list, **r_listend, *l;
     const char *strtab = (const void *)D_PTR(main_map, l_info[DT_STRTAB]);
 
     assert(main_map->l_info[VALIDX(DT_GNU_LIBLISTSZ)] != NULL);
-    liblist = (ElfW(Lib) *)
+    liblist = (ElfW(Lib) *)   // 预链接的库的列表
                   main_map->l_info[ADDRIDX(DT_GNU_LIBLIST)]
                       ->d_un.d_ptr;
     liblistend = (ElfW(Lib) *)((char *)liblist + main_map->l_info[VALIDX(DT_GNU_LIBLISTSZ)]->d_un.d_val);

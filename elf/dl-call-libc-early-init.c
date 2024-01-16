@@ -26,6 +26,7 @@ void
 _dl_call_libc_early_init (struct link_map *libc_map, _Bool initial)
 {
   /* There is nothing to do if we did not actually load libc.so.  */
+  /* 如果我们没有实际加载 libc.so，则无需执行任何操作。 */
   if (libc_map == NULL)
     return;
 
