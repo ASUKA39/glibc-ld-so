@@ -2,6 +2,16 @@
 
 [TOC]
 
+## 参考
+
+- [dl_main源码分析（一）](https://blog.csdn.net/conansonic/article/details/54896433)
+- [dl_main源码分析（二）](https://blog.csdn.net/conansonic/article/details/55536469)
+- [_dl_start源码分析](https://blog.csdn.net/conansonic/article/details/54236335)
+- [Linux动态库加载函数dlopen源码梳理(一)](https://blog.csdn.net/SweeNeil/article/details/83744843)
+- [Linux动态库加载函数dlopen源码梳理(二)](https://blog.csdn.net/SweeNeil/article/details/83749186)
+- [动态链接4 程序员的自我修养第八章笔记](https://blog.csdn.net/passenger12234/article/details/123806611?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-123806611-blog-117436297.235^v40^pc_relevant_3m_sort_dl_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+- 《程序员的自我修养——链接、装载与库》
+
 ## 调用栈
 
 调用栈大致如下，下面只介绍其中一部分较为重要的
