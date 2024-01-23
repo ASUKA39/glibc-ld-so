@@ -11,6 +11,8 @@
 - [Linux动态库加载函数dlopen源码梳理(二)](https://blog.csdn.net/SweeNeil/article/details/83749186)
 - [动态链接4 程序员的自我修养第八章笔记](https://blog.csdn.net/passenger12234/article/details/123806611?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-123806611-blog-117436297.235^v40^pc_relevant_3m_sort_dl_base1&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
 - 《程序员的自我修养——链接、装载与库》
+- [Oracle Solaris 11.4 Linkers and Libraries Guide](https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/)
+- [Oracle Solaris 11 链接程序和库指南](https://docs.oracle.com/cd/E26926_01/html/E25910/toc.html)
 
 ## 调用栈
 
