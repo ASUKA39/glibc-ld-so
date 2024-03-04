@@ -102,12 +102,13 @@ struct link_map
   {
     /* These first few members are part of the protocol with the debugger.
        This is the same format used in SVR4.  */
+    /* 这几个成员是与调试器的协议的一部分。这是SVR4中使用的相同格式。 */
 
-    ElfW(Addr) l_addr;		/* Difference between the address in the ELF
-				   file and the addresses in memory.  */
-    char *l_name;		/* Absolute file name object was found in.  */
-    ElfW(Dyn) *l_ld;		/* Dynamic section of the shared object.  */
-    struct link_map *l_next, *l_prev; /* Chain of loaded objects.  */
+    ElfW(Addr) l_addr;		/* Difference between the address in the ELF file and the addresses in memory.  */
+                          // ELF文件中的地址与内存中的地址之间的差异。
+    char *l_name;		/* Absolute file name object was found in.  */  // 找到对象的绝对文件名
+    ElfW(Dyn) *l_ld;		/* Dynamic section of the shared object.  */  // 共享对象的动态部分
+    struct link_map *l_next, *l_prev; /* Chain of loaded objects.  */ // 加载对象的链表
   };
 
 #ifdef __USE_GNU
